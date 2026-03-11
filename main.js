@@ -101,8 +101,7 @@ async function loadData() {
 
         displayTrees(treesData);
         updateStats(treesData);
-        populateSpeciesList(treesData);
-        populateSpeciesDropdown(treesData); // Added for dropdown logic
+        populateSpeciesDropdown(treesData);
         createFallingFlowers();
     } catch (err) {
         console.error("Failed to load survey data:", err);
@@ -142,7 +141,7 @@ function displayTrees(data) {
 // Show Info Card
 function showInfo(tree) {
     infoCard.classList.remove('hidden');
-    const color = tree.kingdom === "Animalia" ? speciesColors["Animalia"] : (speciesColors[tree.scientificName] || speciesColors["default"]);
+    const color = (speciesColors[tree.scientificName] || speciesColors["default"]);
 
     document.getElementById('card-common-name').textContent = tree.commonName || tree.scientificName;
     document.getElementById('card-scientific-name').textContent = tree.scientificName;
@@ -215,9 +214,12 @@ function populateSpeciesDropdown(data) {
             
             if (term === 'all') {
                 displayTrees(treesData);
+                speciesList.classList.add('hidden');
             } else {
                 const filtered = treesData.filter(t => t.commonName === term);
                 displayTrees(filtered);
+                populateSpeciesList(filtered);
+                speciesList.classList.remove('hidden');
                 if (filtered.length > 0) {
                     const bounds = L.latLngBounds(filtered.map(t => [t.lat, t.lng]));
                     map.fitBounds(bounds, { padding: [100, 100], maxZoom: 16 });
@@ -355,6 +357,12 @@ searchInput.addEventListener('input', () => {
     );
     displayTrees(filtered);
     updateStats(filtered);
+    if (term) {
+        populateSpeciesList(filtered);
+        speciesList.classList.remove('hidden');
+    } else {
+        speciesList.classList.add('hidden');
+    }
 });
 
 // Data Source Filtering
