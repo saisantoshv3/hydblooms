@@ -25,26 +25,6 @@ You can now contribute to the Hyderabad Tree Survey directly from your mobile de
 
 ---
 
-## 🚀 Deployment Instructions
-
-### How to Host on GitHub Pages
-1. **Create a Repository:** Create a new repository on GitHub named `hydblooms`.
-2. **Push to GitHub:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit with mobile-friendly features"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/hydblooms.git
-   git push -u origin main
-   ```
-3. **Enable Pages:** Go to your repository's **Settings > Pages**. Under "Build and deployment", set the source to "Deploy from a branch" and select `main` (root folder).
-
-### Important Note on Data
-The raw dataset folder (`dwca-wwf-india-hat-biodiversity-survey-2024-v1.2`) is **excluded** from the repository via `.gitignore` to keep the project lightweight. The application uses the processed `trees.json` file to display data, which is all that's needed for the live site.
-
----
-
 ## 📅 Future Roadmap
 - **Community Moderation:** Verification system for user-submitted data.
 - **AI Species Help:** Automatic species recognition from uploaded photos.
