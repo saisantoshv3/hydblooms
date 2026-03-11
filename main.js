@@ -26,22 +26,21 @@ const photoInputs = document.querySelectorAll('.photo-btn input');
 const photoPreview = document.getElementById('photo-preview');
 const flowerContainer = document.getElementById('falling-flowers-container');
 
-// Color mapping based on Hyderabad species features
+// Color mapping refined for Floral theme
 const speciesColors = {
-    "Peltophorum pterocarpum": "#f1c40f", // Yellow
-    "Cassia fistula": "#f1c40f",           // Yellow
-    "Delonix regia": "#e74c3c",           // Red
+    "Peltophorum pterocarpum": "#ffd43b", // Yellow
+    "Cassia fistula": "#ffd43b",           // Yellow
+    "Delonix regia": "#ff4d4d",           // Red
     "Spathodea campanulata": "#e67e22",   // Orange
-    "Bauhinia purpurea": "#9b59b6",       // Purple/Pink
-    "Plumeria alba": "#ffffff",           // White
+    "Bauhinia purpurea": "#ff4d94",       // Pink
+    "Plumeria alba": "#f1f2f6",           // White
     "Tabebuia rosea": "#ff9ff3",          // Pink
-    "Jacaranda mimosifolia": "#5f27cd",   // Purple
-    "Lagerstroemia speciosa": "#ff6b6b",  // Pinkish Red
+    "Jacaranda mimosifolia": "#a29bfe",   // Purple
+    "Lagerstroemia speciosa": "#ff4d94",  // Pink
     "Azadirachta indica": "#2ecc71",      // Green
-    "Albizia lebbeck": "#7ed6df",         // Pale Yellow
+    "Albizia lebbeck": "#ffeaa7",         // Pale Yellow
     "Tamarindus indica": "#f39c12",       // Orange-Yellow
-    "Animalia": "#3498db",                // Blue for wildlife
-    "default": "#27ae60"                  // Deep Green
+    "default": "#ff4d94"                  // Pink theme default
 };
 
 const HYDERABAD_CENTER = [17.4184, 78.41];
@@ -55,7 +54,7 @@ function initMap() {
     map = L.map('map', {
         center: HYDERABAD_CENTER,
         zoom: 12,
-        layers: [esriSat],
+        layers: [osm], // Street Map default as requested
         zoomControl: false
     });
 
@@ -73,9 +72,11 @@ function initMap() {
         spiderfyOnMaxZoom: true,
         maxClusterRadius: 50,
         iconCreateFunction: (cluster) => {
+            const children = cluster.getAllChildMarkers();
+            const source = children[0].options.source || 'census';
             return L.divIcon({
                 html: `<span>${cluster.getChildCount()}</span>`,
-                className: 'custom-cluster-icon',
+                className: `custom-cluster-icon ${source}`,
                 iconSize: [40, 40]
             });
         }
@@ -96,10 +97,13 @@ async function loadData() {
     try {
         const response = await fetch('trees.json');
         treesData = await response.json();
+        // Add source to all current data, categorizing existing data as 'census'
+        treesData = treesData.map(t => ({ ...t, source: t.source || 'census' }));
 
         displayTrees(treesData);
         updateStats(treesData);
         populateSpeciesList(treesData);
+        populateSpeciesDropdown(treesData); // Added for dropdown logic
         createFallingFlowers();
     } catch (err) {
         console.error("Failed to load survey data:", err);
@@ -112,8 +116,9 @@ function displayTrees(data) {
     markers = [];
 
     data.forEach(tree => {
-        const color = tree.kingdom === "Animalia" ? speciesColors["Animalia"] : (speciesColors[tree.scientificName] || speciesColors["default"]);
-        const emoji = tree.kingdom === "Animalia" ? "🦋" : "🌳";
+        const sourceColor = tree.source === 'census' ? '#ffd43b' : '#ff4d94';
+        const color = tree.source === 'census' ? sourceColor : (speciesColors[tree.scientificName] || speciesColors["default"]);
+        const emoji = tree.source === 'census' ? "🌳" : "🌸";
 
         const treeIcon = L.divIcon({
             className: 'custom-tree-icon',
@@ -122,7 +127,7 @@ function displayTrees(data) {
             iconAnchor: [15, 15]
         });
 
-        const marker = L.marker([tree.lat, tree.lng], { icon: treeIcon });
+        const marker = L.marker([tree.lat, tree.lng], { icon: treeIcon, source: tree.source });
         marker.on('click', () => {
             showInfo(tree);
             map.flyTo([tree.lat, tree.lng], 16);
@@ -167,7 +172,7 @@ function populateSpeciesList(data) {
         const entry = treesData.find(t => t.scientificName === scName);
         if (!entry) return;
 
-        const color = entry.kingdom === "Animalia" ? speciesColors["Animalia"] : (speciesColors[scName] || speciesColors["default"]);
+        const color = speciesColors[scName] || speciesColors["default"];
         const li = document.createElement('li');
         li.className = 'species-item';
         li.innerHTML = `
@@ -186,6 +191,33 @@ function populateSpeciesList(data) {
             }
         });
         speciesList.appendChild(li);
+    });
+}
+
+function populateSpeciesDropdown(data) {
+    const speciesSelect = document.getElementById('species-select');
+    // Get unique names, handling both common and scientific
+    const names = Array.from(new Set(data.map(t => t.commonName))).filter(n => n).sort();
+    
+    names.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        speciesSelect.appendChild(option);
+    });
+
+    speciesSelect.addEventListener('change', (e) => {
+        const term = e.target.value;
+        if (term === 'all') {
+            displayTrees(treesData);
+        } else {
+            const filtered = treesData.filter(t => t.commonName === term);
+            displayTrees(filtered);
+            if (filtered.length > 0) {
+                const bounds = L.latLngBounds(filtered.map(t => [t.lat, t.lng]));
+                map.fitBounds(bounds, { padding: [100, 100], maxZoom: 16 });
+            }
+        }
     });
 }
 
@@ -280,15 +312,21 @@ bloomForm.addEventListener('submit', (e) => {
     const data = Object.fromEntries(formData.entries());
 
     // Add manual fields
-    data.lat = bloomLatInput.value;
-    data.lng = bloomLngInput.value;
+    data.lat = parseFloat(bloomLatInput.value);
+    data.lng = parseFloat(bloomLngInput.value);
     data.locationName = bloomLocationInput.value;
     data.timestamp = new Date().toISOString();
+    data.source = 'community';
+    data.kingdom = 'Plantae';
 
     console.log("New Bloom Submission:", data);
 
-    // Simulate saving
-    alert("Thank you! Your bloom has been spotted. In a real app, this would be saved to the database.");
+    // Simulate reactive update
+    treesData.push(data);
+    displayTrees(treesData);
+    updateStats(treesData);
+
+    alert("Thank you! Your bloom has been spotted and added to Community Spots.");
 
     // Reset and close
     bloomForm.reset();
@@ -318,14 +356,13 @@ searchInput.addEventListener('input', () => {
 
 sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('hidden'));
 
-// Kingdom Filtering
-document.querySelectorAll('input[name="kingdom"]').forEach(cb => {
+// Data Source Filtering
+document.querySelectorAll('input[name="source"]').forEach(cb => {
     cb.addEventListener('change', () => {
-        const checkedKingdoms = Array.from(document.querySelectorAll('input[name="kingdom"]:checked')).map(v => v.value);
-        const filtered = treesData.filter(t => checkedKingdoms.includes(t.kingdom));
+        const checkedSources = Array.from(document.querySelectorAll('input[name="source"]:checked')).map(v => v.value);
+        const filtered = treesData.filter(t => checkedSources.includes(t.source));
         displayTrees(filtered);
         updateStats(filtered);
-        populateSpeciesList(filtered);
     });
 });
 

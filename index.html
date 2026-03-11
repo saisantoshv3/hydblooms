@@ -58,22 +58,29 @@
             </div>
 
             <div class="filters-container">
-                <h3>Filter by Category</h3>
+                <h3>Filter by Data Source</h3>
                 <div class="filter-group">
                     <label class="filter-chip">
-                        <input type="checkbox" name="kingdom" value="Plantae" checked>
-                        <span>Trees 🌳</span>
+                        <input type="checkbox" name="source" value="census" checked>
+                        <span>Census Trees 🟡</span>
                     </label>
                     <label class="filter-chip">
-                        <input type="checkbox" name="kingdom" value="Animalia" checked>
-                        <span>Wildlife 🦋</span>
+                        <input type="checkbox" name="source" value="community" checked>
+                        <span>Community Spots 💮</span>
                     </label>
                 </div>
             </div>
 
             <nav id="species-list-container">
-                <h3>Common Species</h3>
-                <ul id="species-list">
+                <h3>Filter by Species</h3>
+                <div class="species-dropdown-container">
+                    <select id="species-select">
+                        <option value="all">All Species</option>
+                        <!-- Dynamic Options -->
+                    </select>
+                </div>
+                <!-- Optional: keep the top list but style it as a sub-panel -->
+                <ul id="species-list" class="hidden">
                     <!-- Dynamic List -->
                 </ul>
             </nav>
@@ -124,7 +131,23 @@
             <div id="map-legend">
                 <h4>Legend</h4>
                 <div class="legend-item">
-                    <span class="dot" style="background: #2ecc71;"></span> Tree Location
+                    <span class="dot" style="background: var(--census-color);"></span> Census Tree
+                </div>
+                <div class="legend-item">
+                    <span class="dot" style="background: var(--community-color);"></span> Community Bloom
+                </div>
+            </div>
+
+            <!-- Scrolling Ticker -->
+            <div id="ticker-container">
+                <div class="ticker-wrap">
+                    <div class="ticker-item">🌸 Spot a Bloom? Click the pink button!</div>
+                    <div class="ticker-item">🌳 Spot a Tree? Share your discovery!</div>
+                    <div class="ticker-item">📍 Hyderabad Tree Biodiversity Survey 2026</div>
+                    <div class="ticker-item">💮 Help map the city's green wealth!</div>
+                    <!-- Repeat for smooth loop -->
+                    <div class="ticker-item">🌸 Spot a Bloom? Click the pink button!</div>
+                    <div class="ticker-item">🌳 Spot a Tree? Share your discovery!</div>
                 </div>
             </div>
 
