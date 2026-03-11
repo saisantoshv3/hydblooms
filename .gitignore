@@ -9,6 +9,9 @@ Thumbs.db
 dwca-wwf-india-hat-biodiversity-survey-2024-v1.2/
 *.zip
 *.csv
+*.xlsx
+*.xls
+*.ipynb
 
 # Python environment
 .venv/

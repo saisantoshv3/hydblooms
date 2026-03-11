@@ -31,4 +31,11 @@ You can now contribute to the Hyderabad Tree Survey directly from your mobile de
 - **Historical Analysis:** Yearly time-lapse of bloom patterns across the city.
 - **Database Scaling:** Transition to PostGIS for handling huge datasets in 2026 and beyond.
 
+---
+
+### Source : Vaishnav R D, Tampal F (2025). Hyderabad Annual Tree Biodiversity Survey - 2024. Version 1.0. Training Organization. Samplingevent dataset. https://training-ipt-b.gbif.org/resource?r=wwf-hat-survey-2024&v=1.0
+
+
+
+
 © 2026 HydBlooms | Sai Santosh
