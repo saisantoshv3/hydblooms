@@ -1,0 +1,19 @@
+# Node modules
+node_modules/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Large and Raw Data (Not needed for live application)
+dwca-wwf-india-hat-biodiversity-survey-2024-v1.2/
+*.zip
+*.csv
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+
+# Build output
+dist/
