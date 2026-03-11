@@ -31,4 +31,4 @@ You can now contribute to the Hyderabad Tree Survey directly from your mobile de
 - **Historical Analysis:** Yearly time-lapse of bloom patterns across the city.
 - **Database Scaling:** Transition to PostGIS for handling huge datasets in 2026 and beyond.
 
-© 2025 HydBlooms | Sai Santosh
+© 2026 HydBlooms | Sai Santosh
