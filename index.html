@@ -28,9 +28,7 @@
 
 <body>
     <div id="app">
-        <!-- Mobile Toggle Button -->
-        <button id="sidebar-toggle" class="mobile-only">☰</button>
-
+    <div id="app">
         <!-- Sidebar -->
         <aside id="sidebar">
             <header>
@@ -46,7 +44,7 @@
                 <button id="search-btn">🔍</button>
             </div>
 
-            <div class="stats">
+            <div class="stats desktop-only">
                 <div class="stat-card">
                     <span class="stat-value" id="total-trees">0</span>
                     <span class="stat-label">Trees Mapped</span>
@@ -57,16 +55,16 @@
                 </div>
             </div>
 
-            <div class="filters-container">
+            <div class="filters-container desktop-only">
                 <h3>Filter by Data Source</h3>
                 <div class="filter-group">
                     <label class="filter-chip">
                         <input type="checkbox" name="source" value="census" checked>
-                        <span>Census Trees 🟡</span>
+                        <span>Census 🟡</span>
                     </label>
                     <label class="filter-chip">
                         <input type="checkbox" name="source" value="community" checked>
-                        <span>Community Spots 💮</span>
+                        <span>Community 💮</span>
                     </label>
                 </div>
             </div>
@@ -85,19 +83,42 @@
                 </ul>
             </nav>
 
-            <footer>
-                <p>Data Source: <a href="https://training-ipt-b.gbif.org/resource?r=wwf-hat-survey-2024&v=1.0"
-                        target="_blank" rel="noopener">WWF HAT Survey 2024</a></p>
-                <p>© 2025 Tree Biodiversity Project</p>
+            <footer class="desktop-only">
+                <p>© 2026 HydBlooms | Sai Santosh</p>
             </footer>
         </aside>
 
         <!-- Main Map Area -->
         <main id="map-container">
+            <!-- Mobile Top Filters -->
+            <div id="mobile-top-bar" class="mobile-only">
+                <div class="mobile-filter-row">
+                    <div class="mobile-select-wrapper">
+                        <select class="mobile-species-select">
+                            <option value="all">Species</option>
+                        </select>
+                    </div>
+                    <div class="mobile-source-filters">
+                        <label class="mobile-chip">
+                            <input type="checkbox" name="source" value="census" checked>
+                            <span>Census</span>
+                        </label>
+                        <label class="mobile-chip">
+                            <input type="checkbox" name="source" value="community" checked>
+                            <span>Community</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
             <div id="map"></div>
 
             <button id="home-btn" title="Return to Hyderabad Center">🏡</button>
-            <button id="add-bloom-btn" title="Spot a Bloom">🌸</button>
+            <button id="add-bloom-btn" class="rolling-btn">
+                <span class="btn-rolling-content">
+                    <span class="icon">📸</span>
+                    <span class="text">Spot a Tree / Bloom</span>
+                </span>
+            </button>
 
             <div id="falling-flowers-container"></div>
 
@@ -138,18 +159,7 @@
                 </div>
             </div>
 
-            <!-- Scrolling Ticker -->
-            <div id="ticker-container">
-                <div class="ticker-wrap">
-                    <div class="ticker-item">🌸 Spot a Bloom? Click the pink button!</div>
-                    <div class="ticker-item">🌳 Spot a Tree? Share your discovery!</div>
-                    <div class="ticker-item">📍 Hyderabad Tree Biodiversity Survey 2026</div>
-                    <div class="ticker-item">💮 Help map the city's green wealth!</div>
-                    <!-- Repeat for smooth loop -->
-                    <div class="ticker-item">🌸 Spot a Bloom? Click the pink button!</div>
-                    <div class="ticker-item">🌳 Spot a Tree? Share your discovery!</div>
-                </div>
-            </div>
+            <!-- Ticker removed -->
 
             <!-- Spot a Bloom Modal/Drawer -->
             <div id="bloom-modal" class="hidden">

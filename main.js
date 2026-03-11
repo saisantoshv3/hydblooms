@@ -12,7 +12,6 @@ const totalTreesEl = document.getElementById('total-trees');
 const totalSpeciesEl = document.getElementById('total-species');
 const searchInput = document.getElementById('search-input');
 const sidebar = document.getElementById('sidebar');
-const sidebarToggle = document.getElementById('sidebar-toggle');
 const homeBtn = document.getElementById('home-btn');
 const addBloomBtn = document.getElementById('add-bloom-btn');
 const bloomModal = document.getElementById('bloom-modal');
@@ -195,29 +194,36 @@ function populateSpeciesList(data) {
 }
 
 function populateSpeciesDropdown(data) {
-    const speciesSelect = document.getElementById('species-select');
-    // Get unique names, handling both common and scientific
-    const names = Array.from(new Set(data.map(t => t.commonName))).filter(n => n).sort();
+    const selects = document.querySelectorAll('.species-select, .mobile-species-select');
+    const names = Array.from(new Set(data.filter(t => t.commonName).map(t => t.commonName))).sort();
     
-    names.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        speciesSelect.appendChild(option);
-    });
+    selects.forEach(select => {
+        // Clear existing options except first
+        while (select.options.length > 1) select.remove(1);
+        
+        names.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+        });
 
-    speciesSelect.addEventListener('change', (e) => {
-        const term = e.target.value;
-        if (term === 'all') {
-            displayTrees(treesData);
-        } else {
-            const filtered = treesData.filter(t => t.commonName === term);
-            displayTrees(filtered);
-            if (filtered.length > 0) {
-                const bounds = L.latLngBounds(filtered.map(t => [t.lat, t.lng]));
-                map.fitBounds(bounds, { padding: [100, 100], maxZoom: 16 });
+        select.addEventListener('change', (e) => {
+            const term = e.target.value;
+            // Sync all selects
+            selects.forEach(s => s.value = term);
+            
+            if (term === 'all') {
+                displayTrees(treesData);
+            } else {
+                const filtered = treesData.filter(t => t.commonName === term);
+                displayTrees(filtered);
+                if (filtered.length > 0) {
+                    const bounds = L.latLngBounds(filtered.map(t => [t.lat, t.lng]));
+                    map.fitBounds(bounds, { padding: [100, 100], maxZoom: 16 });
+                }
             }
-        }
+        });
     });
 }
 
@@ -280,9 +286,6 @@ async function fetchGPSLocation() {
 // Event Listeners
 addBloomBtn.addEventListener('click', () => {
     bloomModal.classList.remove('hidden');
-    if (window.innerWidth < 768) {
-        sidebar.classList.add('hidden');
-    }
 });
 
 closeModalBtn.addEventListener('click', () => {
@@ -354,12 +357,18 @@ searchInput.addEventListener('input', () => {
     updateStats(filtered);
 });
 
-sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('hidden'));
-
 // Data Source Filtering
 document.querySelectorAll('input[name="source"]').forEach(cb => {
-    cb.addEventListener('change', () => {
-        const checkedSources = Array.from(document.querySelectorAll('input[name="source"]:checked')).map(v => v.value);
+    cb.addEventListener('change', (e) => {
+        const source = e.target.value;
+        const checked = e.target.checked;
+        
+        // Sync all checkboxes with same value
+        document.querySelectorAll(`input[name="source"][value="${source}"]`).forEach(input => {
+            input.checked = checked;
+        });
+
+        const checkedSources = Array.from(new Set(Array.from(document.querySelectorAll('input[name="source"]:checked')).map(v => v.value)));
         const filtered = treesData.filter(t => checkedSources.includes(t.source));
         displayTrees(filtered);
         updateStats(filtered);
@@ -368,6 +377,5 @@ document.querySelectorAll('input[name="source"]').forEach(cb => {
 
 window.addEventListener('DOMContentLoaded', () => {
     initMap();
-    if (window.innerWidth < 768) sidebar.classList.add('hidden');
     loadData();
 });
