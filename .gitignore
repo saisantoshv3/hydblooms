@@ -17,3 +17,6 @@ __pycache__/
 
 # Build output
 dist/
+
+# Project configuration
+GEMINI.md
